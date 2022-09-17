@@ -1,6 +1,7 @@
 import gspread
 from google.oauth2.service_account import Credentials
 
+
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive.file",
@@ -120,18 +121,55 @@ def calculate_stock_data(data):
 
 def main():
     """
-    Run all program functions
+    Run all program functions.
     """
     data = get_sales_data()
     sales_data = [int(num) for num in data]
     update_worksheet(sales_data, "sales")
-    new_surplus_data = calculate_surplus_data(sales_data)
-    update_worksheet(new_surplus_data, "surplus")
+
+    new_surplus_row = calculate_surplus_data(sales_data)
+    update_worksheet(new_surplus_row, "surplus")
+
     sales_columns = get_last_5_entries_sales()
     stock_data = calculate_stock_data(sales_columns)
-    print(stock_data)
     update_worksheet(stock_data, "stock")
+    return stock_data
 
 
-print("Welcome to Love Sandwiches Data Automation")
-main()
+print("Welcome to Love Sandwiches data automation.\n")
+stock_data = main()
+
+
+# My solution to the challenge
+
+def get_stock_values(data):
+    stock_sheet = SHEET.worksheet("stock")
+    """
+     reach out to the worksheet and 
+     retrieve the headings and assign them to the variable named: headings
+    """
+    headings = []
+    for ind in range(1,7):
+        heading = stock_sheet.col_values(ind)
+        headings.append(heading[0])
+       
+    """
+    create a dictionary, 
+    using the headings values for the dictionary keys 
+    and the data values for the dictionary values and return this from your function.
+    """
+    my_dict = {}
+    for headings, data in zip(headings, data):
+        mydict = {
+            headings: data
+        }
+        my_dict.update(mydict)
+        
+    
+    return my_dict
+    
+
+    
+stock_values = get_stock_values(stock_data)
+print("Make the following numbers of sandwiches next market:\n")
+print(stock_values)
